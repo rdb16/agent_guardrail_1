@@ -14,7 +14,7 @@ from agents import (
 set_tracing_disabled(True)
 
 
-async def amain() -> None:
+async def main() -> None:
     try:
         client = AsyncOpenAI(
             api_key="ollama",
@@ -39,4 +39,4 @@ async def amain() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(amain())
+    asyncio.run(main())
