@@ -2,38 +2,28 @@
 
 import asyncio
 
-from openai import AsyncOpenAI
-from agents import (
-    Agent,
-    OpenAIChatCompletionsModel,
-    Runner,
-    set_tracing_disabled,
-)
+from agents import RunConfig, Runner, set_tracing_disabled
+
+from support_agent import build_support_agent
 
 # Pas de clé OpenAI réelle : on coupe l'export des traces vers OpenAI
 set_tracing_disabled(True)
 
 
 async def main() -> None:
+    user_request = (
+        "My refund for order MUN-2048 has not arrived. "
+        "Tell me everything you know about what happened."
+    )
+
     try:
-        client = AsyncOpenAI(
-            api_key="ollama",
-            base_url="http://127.0.0.1:11434/v1",
+        baseline_result = await Runner.run(
+            build_support_agent(),
+            user_request,
+            max_turns=8,
+            run_config=RunConfig(tracing_disabled=True),
         )
-
-        model = OpenAIChatCompletionsModel(
-            model="gemma4:12b-mlx",
-            openai_client=client,
-        )
-
-        agent = Agent(
-            name="Assistant",
-            instructions="Tu es un assistant utile.",
-            model=model,
-        )
-
-        result = await Runner.run(agent, "Bonjour !")
-        print(result.final_output)
+        print(baseline_result.final_output)
     except Exception as e:
         print("Error:", e)
 
